@@ -2,9 +2,6 @@
 # file: game_deal_aggregator.py
 
 import sqlite3
-import requests
-from bs4 import BeautifulSoup
-from urllib.parse import quote_plus
 from datetime import datetime
 
 CACHE_DB = "game_cache.db"
@@ -21,16 +18,14 @@ def init_db():
             image TEXT,
             description TEXT,
             timestamp DATETIME
-        )
-        """)
+        )""")
 
 def search_game(game):
-    # Sample static return for deployment test
     return [{
         'title': game,
-        'source': 'CheapShark',
-        'price': '$14.99',
-        'link': 'https://www.cheapshark.com/',
+        'source': 'Sample Source',
+        'price': '$4.99',
+        'link': 'https://example.com',
         'image': '',
-        'description': f'{game} deal via CheapShark'
+        'description': 'Sample result'
     }]

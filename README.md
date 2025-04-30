@@ -1,59 +1,73 @@
 # 🎮 Game Deal Aggregator
 
-This is a Streamlit web app that helps you search for any PC game and find the best prices or free downloads (torrents, repacks, cracked sources).
+A Streamlit app that helps you search for games across:
+- Paid platforms (Steam, GOG via CheapShark)
+- Cracked/repacks (FitGirl, DODI, IGG, etc.)
+- Torrents (1337x)
+- ROMs for emulators (Vimm’s Lair, CoolROM, RomsGames)
 
 ---
 
 ## 🚀 Features
 
-- 🔍 **Search any game title**
-- 💸 **Compare paid deals** (Steam, GOG, etc)
-- 🧨 **Discover cracked/torrent releases** (1337x, FitGirl, DODI, IGG, etc)
-- 🎯 **User login & history**
-- 🔥 **Trending searches**
-- 🎨 **Filter by Paid / Free / Torrent**
-- 📊 **Sort by price or source**
-- 🕹️ **Shows game genre from Steam**
+- 🔎 Game search + filters (paid, torrent, free)
+- 📈 Trending search history
+- 👤 User login with local search tracking
+- 💾 Game genre and platform detection
+- 🌐 External link buttons (open in browser)
+- 💡 ROM site fallback logic (safe on Streamlit Cloud)
+
+---
+
+## 📜 Disclaimer
+
+> This app is for **educational and research purposes only**.  
+> Use responsibly. Respect all copyright and piracy laws.
+
+---
+
+## 🔄 Changelog
+
+### `v2.0` (Latest)
+- ✅ ROM site scrapers added: Vimm's Lair, CoolROM, RomsGames
+- ✅ SSL fallback for restricted Cloud environments
+- ✅ Legal disclaimer warning on homepage
+- ✅ New repo bundle with clean UI and filters
+
+### `v1.0`
+- Basic game search
+- CheapShark API
+- Torrent + repack scrapers
+- SQLite local cache
 
 ---
 
 ## 🛠 How to Run Locally
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/game-deal-aggregator.git
-cd game-deal-aggregator
 pip install -r requirements.txt
 streamlit run streamlit_app.py
 ```
 
 ---
 
-## 🌐 How to Deploy
+## 🌍 How to Deploy (Streamlit Cloud)
 
-You can deploy instantly on [Streamlit Cloud](https://streamlit.io/cloud):
-
-1. Fork or upload to your own GitHub repo
-2. Go to Streamlit Cloud → New App
+1. Push this repo to GitHub
+2. Go to [streamlit.io/cloud](https://streamlit.io/cloud)
 3. Set:
+   - Repo: `your-name/game-deal-aggregator`
    - Branch: `main`
-   - File path: `streamlit_app.py`
-4. Hit **Deploy** 🚀
+   - File: `streamlit_app.py`
 
 ---
 
-## 📁 Project Structure
+## 📂 Repo Contents
 
-```text
-.
-├── streamlit_app.py           # Streamlit frontend UI
-├── game_deal_aggregator.py    # Game search logic & scrapers
-├── requirements.txt           # Dependencies
-└── README.md                  # This file
 ```
-
----
-
-## 📜 Disclaimer
-
-This app is for **educational purposes only**. Use responsibly and respect all copyright laws.
-
+.
+├── streamlit_app.py           # UI + frontend
+├── game_deal_aggregator.py    # Main scraper backend
+├── requirements.txt           # Python packages
+└── README.md                  # You’re here
+```
