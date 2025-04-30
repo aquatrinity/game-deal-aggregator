@@ -140,7 +140,6 @@ if st.button("Search") and game:
         conn.execute("INSERT INTO searches (username, game, timestamp) VALUES (?, ?, ?)", (st.session_state.user, game, datetime.utcnow()))
 
     data = search_game(game)
-    data += search_rom_vimms(game)
     data += search_rom_coolrom(game)
     data += search_rom_romsgames(game)
 
