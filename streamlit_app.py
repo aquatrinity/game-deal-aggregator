@@ -6,6 +6,10 @@ from collections import Counter
 import pandas as pd
 from datetime import datetime
 from game_deal_aggregator import init_db, search_game, CACHE_DB
+import webbrowser
+import requests
+from bs4 import BeautifulSoup
+from urllib.parse import quote_plus
 
 init_db()
 
@@ -23,6 +27,12 @@ with sqlite3.connect(CACHE_DB) as conn:
 st.set_page_config(page_title="Game Deal Aggregator", layout="wide")
 st.title("🎮 Game Deal Aggregator")
 
+st.warning("""
+📜 **Disclaimer**: This app is for educational and research purposes only.
+You are solely responsible for how you use the data.
+Respect all copyright and piracy laws in your region.
+""")
+
 # --- User login mock (simple session auth) ---
 if 'user' not in st.session_state:
     st.session_state.user = None
@@ -35,10 +45,9 @@ if not st.session_state.user:
         if submit:
             if username and password:
                 st.session_state.user = username
-                st.experimental_rerun()
             else:
                 st.error("Username and password required")
-    st.stop()
+        st.stop()
 
 st.success(f"Welcome {st.session_state.user}!")
 
@@ -57,6 +66,68 @@ with sqlite3.connect(CACHE_DB) as conn:
     for title, count in counter.most_common(5):
         st.markdown(f"- **{title}** ({count} searches)")
 
+# --- ROM scrapers ---
+def search_rom_vimms(game):
+    results = []
+    url = f"https://vimm.net/vault/?p=list&q={quote_plus(game)}"
+    response = requests.get(url, headers={"User-Agent": "Mozilla/5.0"})
+    soup = BeautifulSoup(response.text, 'html.parser')
+    for row in soup.select("table.list tr")[1:6]:
+        cols = row.find_all('td')
+        if len(cols) >= 3:
+            title = cols[0].get_text(strip=True)
+            platform = cols[1].get_text(strip=True)
+            link_tag = cols[0].find('a')
+            if link_tag and link_tag['href']:
+                link = f"https://vimm.net{link_tag['href']}"
+                results.append({
+                    'title': title,
+                    'source': "Vimm's Lair",
+                    'price': 'Free (ROM)',
+                    'link': link,
+                    'image': '',
+                    'description': f"ROM for {platform}"
+                })
+    return results
+
+def search_rom_coolrom(game):
+    results = []
+    url = f"https://coolrom.com/search?q={quote_plus(game)}"
+    response = requests.get(url, headers={"User-Agent": "Mozilla/5.0"})
+    soup = BeautifulSoup(response.text, 'html.parser')
+    for row in soup.select(".gamelist li")[:5]:
+        a = row.find('a')
+        if a:
+            title = a.get_text(strip=True)
+            link = f"https://coolrom.com{a['href']}"
+            results.append({
+                'title': title,
+                'source': "CoolROM",
+                'price': 'Free (ROM)',
+                'link': link,
+                'image': '',
+                'description': 'ROM listing from CoolROM'
+            })
+    return results
+
+def search_rom_romsgames(game):
+    results = []
+    url = f"https://www.romsgames.net/?s={quote_plus(game)}"
+    response = requests.get(url, headers={"User-Agent": "Mozilla/5.0"})
+    soup = BeautifulSoup(response.text, 'html.parser')
+    for post in soup.select(".entry-title a")[:5]:
+        title = post.get_text(strip=True)
+        link = post['href']
+        results.append({
+            'title': title,
+            'source': "RomsGames",
+            'price': 'Free (ROM)',
+            'link': link,
+            'image': '',
+            'description': 'ROM post from RomsGames.net'
+        })
+    return results
+
 # --- Game search ---
 st.subheader("🔎 Search a Game")
 game = st.text_input("Enter a game title")
@@ -69,6 +140,9 @@ if st.button("Search") and game:
         conn.execute("INSERT INTO searches (username, game, timestamp) VALUES (?, ?, ?)", (st.session_state.user, game, datetime.utcnow()))
 
     data = search_game(game)
+    data += search_rom_vimms(game)
+    data += search_rom_coolrom(game)
+    data += search_rom_romsgames(game)
 
     # Filter logic
     if filter_option == "Paid":
@@ -97,5 +171,6 @@ if st.button("Search") and game:
             st.image(d['image'], width=150) if d['image'] else None
             st.markdown(f"`{d['price']}` — *{d['source']}*")
             st.markdown(f"{d['description'][:200]}...")
-            st.markdown(f"[🔗 Visit Site]({d['link']})")
+            if st.button(f"🔗 Open in new tab: {d['source']}", key=d['link']):
+                webbrowser.open_new_tab(d['link'])
             st.markdown("---")
