@@ -1,5 +1,4 @@
 # file: streamlit_app.py
-# file: streamlit_app.py
 
 import streamlit as st
 import sqlite3
